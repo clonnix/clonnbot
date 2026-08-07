@@ -4,8 +4,12 @@ import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.sun.net.httpserver.HttpServer;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +32,8 @@ public class Main {
     private static volatile boolean globalCooldownEnabled = false;
 
     public static void main(String[] args) {
+
+        startHealthCheckServer();
 
         Config.validate();
         BotMemory.loadAll();
@@ -91,6 +97,32 @@ public class Main {
         });
 
         System.out.println("Bot running...");
+    }
+
+    // Render's Web Service type expects the app to bind to $PORT and answer
+    // HTTP requests, purely as a liveness check — this bot doesn't otherwise
+    // serve anything. Spin up a trivial server that just returns 200 OK, so
+    // Render's port scanner is satisfied. No new dependency needed: this uses
+    // the JDK's own built-in com.sun.net.httpserver.HttpServer.
+    private static void startHealthCheckServer() {
+        try {
+            int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
+            HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+            server.createContext("/", exchange -> {
+                byte[] body = "OK".getBytes();
+                exchange.sendResponseHeaders(200, body.length);
+                try (OutputStream os = exchange.getResponseBody()) {
+                    os.write(body);
+                }
+            });
+            server.setExecutor(Executors.newSingleThreadExecutor());
+            server.start();
+            System.out.println("Health check server listening on port " + port);
+        } catch (IOException e) {
+            // Non-fatal — the bot's actual job (Twitch chat) doesn't depend
+            // on this. Log it and keep going rather than crash the process.
+            System.err.println("[Main] Failed to start health check server: " + e.getMessage());
+        }
     }
 
     private static void handleMessage(TwitchClient twitchClient, ChannelMessageEvent event) {
