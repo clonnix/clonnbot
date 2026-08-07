@@ -35,6 +35,21 @@
             <groupId>com.github.twitch4j</groupId>
             <artifactId>twitch4j</artifactId>
             <version>1.23.0</version>
+            <exclusions>
+                <!-- credentialmanager pulls jackson-databind:2.18.5, whose own POM
+                     points at a broken/expired jackson-annotations SNAPSHOT that
+                     Maven can no longer resolve. Exclude the whole branch so it's
+                     never touched, and supply our own pinned Jackson below. -->
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
