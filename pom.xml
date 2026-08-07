@@ -16,6 +16,10 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Pin Jackson to a real released version. twitch4j -> credentialmanager
+                 pulls jackson-databind 2.18.5, whose own POM currently points at a
+                 broken jackson-annotations 2.22-SNAPSHOT that isn't published to
+                 Central. Forcing a matching, stable Jackson BOM avoids that. -->
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
@@ -32,6 +36,12 @@
             <artifactId>twitch4j</artifactId>
             <version>1.23.0</version>
             <exclusions>
+                <!-- Several twitch4j submodules (via credentialmanager,
+                     twitch4j-graphql/jackson-datatype-jsr310, etc.) pull in
+                     Jackson artifacts whose POMs currently point at a broken/
+                     expired 2.22-2.23 SNAPSHOT chain that Maven can't resolve.
+                     Exclude the whole Jackson family so none of it is ever
+                     touched, and supply our own pinned versions below. -->
                 <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>
                     <artifactId>*</artifactId>
@@ -82,4 +92,46 @@
             <version>3.0.0</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Builds a runnable "fat jar" containing all dependencies,
+                 with a Main-Class manifest entry. Without this, `java -jar
+                 app.jar` fails with "no main manifest attribute" since the
+                 plain jar has no entry point and none of the dependencies
+                 (twitch4j, okhttp, etc.) on its classpath. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>io.github.clonnix.discordviewtracker.Main</mainClass>
+                                </transformer>
+                            </transformers>
+                            <!-- Avoids "invalid signature file" errors from
+                                 signed dependency jars when merged together. -->
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
