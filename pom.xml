@@ -16,10 +16,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- Pin Jackson to a real released version. twitch4j -> credentialmanager
-                 pulls jackson-databind 2.18.5, whose own POM currently points at a
-                 broken jackson-annotations 2.22-SNAPSHOT that isn't published to
-                 Central. Forcing a matching, stable Jackson BOM avoids that. -->
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
@@ -36,19 +32,38 @@
             <artifactId>twitch4j</artifactId>
             <version>1.23.0</version>
             <exclusions>
-                <!-- credentialmanager pulls jackson-databind:2.18.5, whose own POM
-                     points at a broken/expired jackson-annotations SNAPSHOT that
-                     Maven can no longer resolve. Exclude the whole branch so it's
-                     never touched, and supply our own pinned Jackson below. -->
                 <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-databind</artifactId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.datatype</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.dataformat</groupId>
+                    <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
             <version>${jackson.version}</version>
         </dependency>
         <dependency>
