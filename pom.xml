@@ -11,7 +11,24 @@
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
+        <jackson.version>2.18.2</jackson.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Pin Jackson to a real released version. twitch4j -> credentialmanager
+                 pulls jackson-databind 2.18.5, whose own POM currently points at a
+                 broken jackson-annotations 2.22-SNAPSHOT that isn't published to
+                 Central. Forcing a matching, stable Jackson BOM avoids that. -->
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>${jackson.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
