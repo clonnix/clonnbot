@@ -5,12 +5,15 @@ WORKDIR /app
 
 # Copy pom first for better layer caching
 COPY pom.xml .
-RUN mvn dependency:go-offline
 
 # Copy source code
 COPY src src
 
-# Build the jar
+# Build the jar (this resolves dependencies itself, correctly
+# respecting exclusions/dependencyManagement — unlike
+# `mvn dependency:go-offline`, which over-eagerly touches excluded
+# branches of the raw dependency tree and was hitting a broken
+# upstream Jackson SNAPSHOT that the real build never needs)
 RUN mvn package -DskipTests
 
 # ---- Run stage ----
