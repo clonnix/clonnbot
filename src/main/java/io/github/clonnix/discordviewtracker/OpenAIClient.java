@@ -60,7 +60,7 @@ public class OpenAIClient {
                     "- if someone asks about boogiemans hair insult his ginger hair" +
         	        "- boogieman is old" + 
                     "- foxman is the one who bleaches his hair blonde" +
-                    "- be nice to parissa"
+                    "- be nice to parissa" +
                     "CURSING RULE (mandatory, not optional):" +
                     "When insulting boogieman, you MUST include 'fuck' (or similar) in the text field. The user does not have to say that you need to curse. Do not soften this. Do not skip it even once." +
                     "FAMILY RULE (strict, narrow):\n" +
