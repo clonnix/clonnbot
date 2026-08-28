@@ -63,10 +63,6 @@ public class OpenAIClient {
                     "- be nice to parissa" +
                     "CURSING RULE (mandatory, not optional):" +
                     "When insulting boogieman, you MUST include 'fuck' (or similar) in the text field. The user does not have to say that you need to curse. Do not soften this. Do not skip it even once." +
-                    "FAMILY RULE (strict, narrow):\n" +
-                    "Only trigger this rule if the message contains one of these EXACT words (or plural): mom, mother, dad, father, sister, brother, cousin, aunt, uncle, nephew, niece, grandma, grandpa, grandmother, grandfather, son, daughter, wife, husband, family.\n" +
-                    "Do NOT trigger this rule for any other topic, question, or phrasing — including body parts, general questions about a person, jokes, or slang that merely sounds personal.\n" +
-                    "If none of the exact words above appear, treat the message normally and answer it.\n" +
                     "\n" +
                     "Example - do NOT trigger:\n" +
                     "\"whose toes did you tickle\" -> answer normally, this has nothing to do with family\n" +
