@@ -99,6 +99,21 @@ public class Main {
         System.out.println("Bot running...");
     }
 
+    Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+    System.out.println("[Main] Scheduled Twitch chat reconnect...");
+    twitchClient.getChat().disconnect();
+    try {
+        Thread.sleep(3000); // give the old socket time to fully close
+    } catch (InterruptedException ignored) {
+        Thread.currentThread().interrupt();
+    }
+    twitchClient.getChat().connect();
+    for (String c : channels) {
+        twitchClient.getChat().joinChannel(c);
+    }
+    System.out.println("[Main] Rejoined channels after reconnect.");
+}, 2, 2, TimeUnit.DAYS);
+
     // Render's Web Service type expects the app to bind to $PORT and answer
     // HTTP requests, purely as a liveness check — this bot doesn't otherwise
     // serve anything. Spin up a trivial server that just returns 200 OK, so
