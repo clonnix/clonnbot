@@ -96,23 +96,27 @@ public class Main {
             new Thread(() -> handleMessage(twitchClient, event)).start();
         });
 
+        // Force a full chat disconnect/reconnect every 2 days. twitch4j's IRC
+        // websocket has its own heartbeat/auto-reconnect, but long-lived TMI
+        // connections can go stale or start dropping messages silently, so
+        // this forces a clean cycle on a fixed schedule.
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+            System.out.println("[Main] Scheduled Twitch chat reconnect...");
+            twitchClient.getChat().disconnect();
+            try {
+                Thread.sleep(3000); // give the old socket time to fully close
+            } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
+            }
+            twitchClient.getChat().connect();
+            for (String c : channels) {
+                twitchClient.getChat().joinChannel(c);
+            }
+            System.out.println("[Main] Rejoined channels after reconnect.");
+        }, 2, 2, TimeUnit.DAYS);
+
         System.out.println("Bot running...");
     }
-
-    Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
-    System.out.println("[Main] Scheduled Twitch chat reconnect...");
-    twitchClient.getChat().disconnect();
-    try {
-        Thread.sleep(3000); // give the old socket time to fully close
-    } catch (InterruptedException ignored) {
-        Thread.currentThread().interrupt();
-    }
-    twitchClient.getChat().connect();
-    for (String c : channels) {
-        twitchClient.getChat().joinChannel(c);
-    }
-    System.out.println("[Main] Rejoined channels after reconnect.");
-}, 2, 2, TimeUnit.DAYS);
 
     // Render's Web Service type expects the app to bind to $PORT and answer
     // HTTP requests, purely as a liveness check — this bot doesn't otherwise
