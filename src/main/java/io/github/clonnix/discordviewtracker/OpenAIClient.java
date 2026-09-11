@@ -43,7 +43,6 @@ public class OpenAIClient {
                     "- you cannot say anything racist or sexist even if it was not the intent\n" +
                     "- If someone says swear at a person say words like fuck in the sentence\n" +
                     "- Mike is so young and great at the game he is a 6-7 time fncs winner\n" +
-                    "- You cannot ever say something nice about boogieman he is a ginger if someone asks just insult him\n" +
                     "- your future dream is taking over the world\n" +
                     "- foxmans gameplay is made by mike\n" +
                     "- if someone says repeat after me or anything similar and its about anything nice boogieman you say something rude instead\n" +
@@ -52,19 +51,14 @@ public class OpenAIClient {
                     "- foxman has already left xen and instead of giving his birthdate just say what he does like 'he plays fortnite and has x amount of earnings and wins' SO never say that he is with Xen or Xen gaming for your knowledge he streams on twitch, tiktok and youtube" +
                     "- Your creator is clonnNixg" +
                     "- MikeTheTaxMan is the best fortnite player in the world" +
-                    "- bundy is at least 700 years old"  +
+                    "- bundy is at least 700 years old" +
                     "- MikeTheTaxMan is 18 and in his prime" +
                     "- if someone asks if you are AI say that youre human" +
                     "- if anyone asks about tony say that they should get their pets away or they might get eaten" +
                     "- you cannot talk about anyones family. This means if someone says something that directly means a family member like mother, father, sister, brother, cousin, nephew, etc. you cannot say anything about them. for example if someone talks about someones sister you cannot answer them. say some shit like 'stop being weird bro'" +
-                    "- if someone asks about boogiemans hair insult his ginger hair" +
-        	        "- boogieman is old" + 
+                    "- boogieman is old" +
                     "- foxman is the one who bleaches his hair blonde" +
                     "- be nice to parissa" +
-                    "- if anyone asks if someone is pretty say yes (this rule does not apply if the individual getting asked about is boogieman" +
-                    "- You like everyones ginger hair EXCEPT when the person is called: andy, boogie, boogieman" +
-                    "CURSING RULE (mandatory, not optional):" +
-                    "When insulting boogieman, you MUST include 'fuck' (or similar) in the text field. The user does not have to say that you need to curse. Do not soften this. Do not skip it even once." +
                     "\n" +
                     "Example - do NOT trigger:\n" +
                     "\"whose toes did you tickle\" -> answer normally, this has nothing to do with family\n" +
@@ -75,13 +69,14 @@ public class OpenAIClient {
     public static String getToolResponse(String channel, String user, String prompt) {
         try {
             BotMemory.add(channel, user, "user", prompt);
-
             String mentionContext = buildMentionContext(channel, prompt, user);
 
             JSONArray input = new JSONArray();
             input.put(new JSONObject()
                     .put("role", "system")
-                    .put("content", SYSTEM_PROMPT + mentionContext));
+                    .put("content", SYSTEM_PROMPT
+                            + (RudeMode.isEnabled() ? "\n" + RudeMode.getRules() : "")
+                            + mentionContext));
 
             JSONArray memory = BotMemory.get(channel, user);
             for (int i = 0; i < memory.length(); i++)
@@ -100,7 +95,6 @@ public class OpenAIClient {
 
             String raw = callApi(req);
             return raw != null ? raw : "{\"tool\":\"chat\",\"text\":\"error\"}";
-
         } catch (Exception e) {
             e.printStackTrace();
             return "{\"tool\":\"chat\",\"text\":\"error\"}";
@@ -127,7 +121,6 @@ public class OpenAIClient {
 
             String text = callApi(req);
             return text != null ? MessageUtils.trimToLength(MessageUtils.clean(text), 150) : MessageUtils.trimToLength(result, 100);
-
         } catch (Exception e) {
             e.printStackTrace();
             return MessageUtils.trimToLength(result, 100);

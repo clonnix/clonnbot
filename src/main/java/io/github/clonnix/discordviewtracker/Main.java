@@ -39,6 +39,7 @@ public class Main {
         BotMemory.loadAll();
         BanList.load();
         GoatList.load();
+        RudeMode.load();
 
         // Force a token refresh up front so we never start the bot on a
         // stale access token — Config.ACCESS_TOKEN / REFRESH_TOKEN are
@@ -282,9 +283,9 @@ public class Main {
         }
         if (cleaned.toLowerCase().startsWith("!ruderules")) {
             if (!sender.equals("clonnnixg") && !sender.equals("mikethetaxman")) return;
-            boolean nowOn = RudeMode.toggle();
+            boolean nowEnabled = RudeMode.toggle();
             MessageUtils.send(twitchClient, channel, sender,
-                    nowOn ? "rude rules are now ON" : "rude rules are now OFF");
+                    "rude rules are now " + (nowEnabled ? "ON" : "OFF"));
             return;
         }
         System.out.println("[" + channel + "] " + sender + ": " + cleaned);
