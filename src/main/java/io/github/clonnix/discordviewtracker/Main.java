@@ -282,7 +282,7 @@ public class Main {
             return;
         }
         if (cleaned.toLowerCase().startsWith("!rudemode")) {
-            if (!sender.equals("clonnnixg") && !sender.equals("mikethetaxman")) return;
+            if (!sender.equals("clonnnixg") && !sender.equals("mikethetaxman") && !sender.equals(("doctuahhay"))) return;
             boolean nowEnabled = RudeMode.toggle();
             MessageUtils.send(twitchClient, channel, sender,
                     "rude rules are now " + (nowEnabled ? "ON" : "OFF"));
