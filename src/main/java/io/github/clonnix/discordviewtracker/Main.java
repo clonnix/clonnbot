@@ -281,7 +281,7 @@ public class Main {
                     "goat message has been updated!");
             return;
         }
-        if (cleaned.toLowerCase().startsWith("!ruderules")) {
+        if (cleaned.toLowerCase().startsWith("!rudemode")) {
             if (!sender.equals("clonnnixg") && !sender.equals("mikethetaxman")) return;
             boolean nowEnabled = RudeMode.toggle();
             MessageUtils.send(twitchClient, channel, sender,
